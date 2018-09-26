@@ -16,6 +16,9 @@ class BlockListIP(models.Model):
 class WhiteListIP(models.Model):
     ip_address = models.CharField(max_length=45)
 
+    def get_ip_address(self):
+        return self.ip_address
+
     def __str__(self):
         return "White IP address {}".format(self.ip_address)
 
@@ -24,5 +27,12 @@ def clear_cache(sender, instance, **kwargs):
     cache.set("ip:list", BlockListIP.objects.all())
 
 
+def clear_white_list(sender, instance, **kwargs):
+    cache.set("white:list", WhiteListIP.objects.all())
+
+
 post_save.connect(clear_cache, sender=BlockListIP)
 post_delete.connect(clear_cache, sender=BlockListIP)
+
+post_save.connect(clear_white_list, sender=WhiteListIP)
+post_delete.connect(clear_white_list, sender=WhiteListIP)
